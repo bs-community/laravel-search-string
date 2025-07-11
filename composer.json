@@ -1,0 +1,26 @@
+{
+    "name": "bs-community/laravel-search-string",
+    "type": "library",
+    "description": "Generates database queries based on one unique string using a simple and customizable syntax.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Pig Fang",
+            "email": "g-plane@hotmail.com"
+        }
+    ],
+    "require": {
+        "doctrine/lexer": "^3.0",
+        "illuminate/support": "^10.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^12.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Blessing\\LaravelSearchString\\": "src/"
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
