@@ -2,11 +2,11 @@
 
 namespace Blessing\LaravelSearchString\AST;
 
-enum ComparisonOperator
+enum ComparisonOperator: string
 {
-    case Eq;
-    case Gt;
-    case Lt;
-    case Ge;
-    case Le;
+    case Eq = '=';
+    case Gt = '>';
+    case Lt = '<';
+    case Ge = '>=';
+    case Le = '<=';
 }

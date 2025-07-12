@@ -19,7 +19,7 @@ class Lexer extends AbstractLexer
             "'(?:[^'])*'", '"(?:[^"])*"',
             '[a-zA-Z_][a-zA-Z0-9_\-\/]*',
             '\d+(?:\.\d+)',
-            '=', ':', '>=', '>', '<=', '<', ',', '\(', '\)',
+            '=', ':', '>=', '>', '<=', '<', ',', '\(', '\)', '&&', '||',
         ];
     }
 
@@ -50,6 +50,8 @@ class Lexer extends AbstractLexer
                 ',' => TokenType::Comma,
                 '(' => TokenType::Lparen,
                 ')' => TokenType::Rparen,
+                '&&' => TokenType::AmpAmp,
+                '||' => TokenType::BarBar,
                 default => TokenType::None,
             };
         }

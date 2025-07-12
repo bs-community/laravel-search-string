@@ -20,4 +20,6 @@ enum TokenType
     case Comma;
     case Lparen;
     case Rparen;
+    case AmpAmp;
+    case BarBar;
 }

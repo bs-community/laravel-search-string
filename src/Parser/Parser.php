@@ -8,6 +8,9 @@ use Blessing\LaravelSearchString\AST;
 
 class Parser
 {
+    private const PREC_OR = 0;
+    private const PREC_AND = 1;
+
     protected Lexer $lexer;
 
     public function __construct(string $input)
@@ -17,7 +20,7 @@ class Parser
 
     public function parse()
     {
-        return $this->parseComparison();
+        return $this->parseLogical(self::PREC_OR);
     }
 
     protected function parseComparison(): AST\Comparison
@@ -45,5 +48,36 @@ class Parser
         };
 
         return new AST\Comparison($fieldName, $operator, $fieldValue);
+    }
+
+    protected function parseLogical(int $precedence): AST\Logical|AST\Comparison
+    {
+        if ($precedence === self::PREC_AND) {
+            $left = $this->parseComparison();
+        } else {
+            $left = $this->parseLogical($precedence + 1);
+        }
+
+        while ($token = $this->lexer->glimpse()) {
+            if ($precedence === self::PREC_AND
+                && ($token->type === TokenType::Keyword && $token->value === 'and' || $token->type === TokenType::AmpAmp)) {
+                $operator = AST\LogicalOperator::And;
+            } elseif ($precedence === self::PREC_OR
+                && ($token->type === TokenType::Keyword && $token->value === 'or' || $token->type === TokenType::BarBar)) {
+                $operator = AST\LogicalOperator::Or;
+            } else {
+                return $left;
+            }
+            $this->lexer->moveNext();
+
+            if ($precedence === self::PREC_AND) {
+                $right = $this->parseComparison();
+            } else {
+                $right = $this->parseLogical($precedence + 1);
+            }
+            $left = new AST\Logical($left, $operator, $right);
+        }
+
+        return $left;
     }
 }
