@@ -16,6 +16,6 @@ class SyntaxError extends Error
 
     public static function expected(Token $token, string $thing): self
     {
-        return new self($token, 'expected '.$thing);
+        return new self($token, 'expected '.$thing.', received token '.strtolower($token->type->name));
     }
 }
