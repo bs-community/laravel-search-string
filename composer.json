@@ -15,7 +15,8 @@
     },
     "require-dev": {
         "phpunit/phpunit": "^12.2",
-        "friendsofphp/php-cs-fixer": "^3.82"
+        "friendsofphp/php-cs-fixer": "^3.82",
+        "symfony/var-dumper": "^7.3"
     },
     "autoload": {
         "psr-4": {
