@@ -11,6 +11,7 @@
     ],
     "require": {
         "doctrine/lexer": "^3.0",
+        "illuminate/database": "^10.0",
         "illuminate/support": "^10.0"
     },
     "require-dev": {
