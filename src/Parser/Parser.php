@@ -13,13 +13,15 @@ class Parser
 
     protected Lexer $lexer;
 
-    public function __construct(string $input)
+    public function __construct()
     {
-        $this->lexer = new Lexer($input);
+        $this->lexer = new Lexer();
     }
 
-    public function parse()
+    public function parse(string $input)
     {
+        $this->lexer->setInput($input);
+
         return $this->parseLogical(self::PREC_OR);
     }
 

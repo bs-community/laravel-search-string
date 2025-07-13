@@ -8,11 +8,6 @@ use Doctrine\Common\Lexer\AbstractLexer;
 
 class Lexer extends AbstractLexer
 {
-    public function __construct(string $input)
-    {
-        $this->setInput($input);
-    }
-
     protected function getCatchablePatterns(): array
     {
         return [
