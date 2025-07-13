@@ -2,8 +2,8 @@
 
 namespace Blessing\LaravelSearchString\AST;
 
-enum LogicalOperator
+enum LogicalOperator: string
 {
-    case And;
-    case Or;
+    case And = 'and';
+    case Or = 'or';
 }
