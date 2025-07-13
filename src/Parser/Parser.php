@@ -18,11 +18,19 @@ class Parser
         $this->lexer = new Lexer();
     }
 
-    public function parse(string $input)
+    /**
+     * @return list<AST\Comparison|AST\Logical>
+     */
+    public function parse(string $input): array
     {
         $this->lexer->setInput($input);
 
-        return $this->parseLogical(self::PREC_OR);
+        $logicals = [];
+        while ($this->lexer->glimpse() !== null) {
+            array_push($logicals, $this->parseLogical(self::PREC_OR));
+        }
+
+        return $logicals;
     }
 
     protected function parseComparison(): AST\Comparison

@@ -12,7 +12,7 @@ trait SearchString
     public function scopeUsingSearchString(QueryBuilder $query, string $input)
     {
         $builder = new Builder();
-        $builder->build($query, $input);
+        $query->setQuery($builder->build($query->getQuery(), $input));
 
         return $query;
     }

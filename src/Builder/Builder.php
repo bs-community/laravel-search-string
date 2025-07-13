@@ -6,7 +6,7 @@ namespace Blessing\LaravelSearchString\Builder;
 
 use Blessing\LaravelSearchString\AST;
 use Blessing\LaravelSearchString\Parser\Parser;
-use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 
 class Builder
 {
@@ -20,10 +20,21 @@ class Builder
     public function build(QueryBuilder $query, string $input): QueryBuilder
     {
         $ast = $this->parser->parse($input);
-        if ($ast instanceof AST\Comparison) {
-            $query->where($ast->fieldName, $ast->operator->value, $ast->fieldValue);
-        } elseif ($ast instanceof AST\Logical) {
-            $this->buildLogical($query, $ast);
+        foreach ($ast as $node) {
+            if ($node instanceof AST\Comparison) {
+                if ($node->operator === AST\ComparisonOperator::Eq
+                    && ($node->fieldName === 'limit' || $node->fieldName === 'limits')) {
+                    $query->limit((int) $node->fieldValue);
+                    continue;
+                }
+            }
+            $query->where(function (QueryBuilder $query) use ($node) {
+                if ($node instanceof AST\Comparison) {
+                    $query->where($node->fieldName, $node->operator->value, $node->fieldValue);
+                } elseif ($node instanceof AST\Logical) {
+                    $this->buildLogical($query, $node);
+                }
+            });
         }
 
         return $query;
