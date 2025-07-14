@@ -21,12 +21,14 @@ class Builder
     {
         $ast = $this->parser->parse($input);
         foreach ($ast as $node) {
-            if ($node instanceof AST\Comparison) {
-                if ($node->operator === AST\ComparisonOperator::Eq
-                    && ($node->fieldName === 'limit' || $node->fieldName === 'limits')) {
+            if ($node instanceof AST\Comparison && $node->operator === AST\ComparisonOperator::Eq) {
+                if ($node->fieldName === 'limit' || $node->fieldName === 'limits') {
                     $query->limit((int) $node->fieldValue);
                     continue;
-                } elseif ($node->operator === AST\ComparisonOperator::Eq && $node->fieldName === 'sort') {
+                } elseif ($node->fieldName === 'from') {
+                    $query->offset((int) $node->fieldValue);
+                    continue;
+                } elseif ($node->fieldName === 'sort') {
                     if ($node->fieldValue[0] === '-') {
                         $query->orderByDesc(substr($node->fieldValue, 1));
                     } else {
