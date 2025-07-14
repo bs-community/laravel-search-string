@@ -18,6 +18,7 @@ enum TokenType
     case Le;
     case Colon;
     case Comma;
+    case Dash;
     case Lparen;
     case Rparen;
     case AmpAmp;
