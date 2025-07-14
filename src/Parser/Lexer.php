@@ -13,7 +13,7 @@ class Lexer extends AbstractLexer
         return [
             "'(?:[^'])*'", '"(?:[^"])*"',
             '[a-zA-Z_][a-zA-Z0-9_\-\/]*',
-            '\d+(?:\.\d+)',
+            '[+-]?\d+(?:\.\d+)?',
             '=', ':', '>=', '>', '<=', '<', ',', '\(', '\)', '&&', '||',
         ];
     }
@@ -27,7 +27,7 @@ class Lexer extends AbstractLexer
     {
         if ($value[0] === '"' || $value[0] === "'") {
             return TokenType::String;
-        } elseif (ctype_digit(str_replace('.', '', $value))) {
+        } elseif (is_numeric($value)) {
             return TokenType::Number;
         } elseif (ctype_alnum($value[0]) || $value[0] === '-' || $value[0] === '_') {
             return match ($value) {
