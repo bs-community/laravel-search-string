@@ -64,10 +64,26 @@ class Parser
         return new AST\Comparison($fieldName, $operator, $fieldValue);
     }
 
-    protected function parseLogical(int $precedence): AST\Logical|AST\Comparison|AST\SearchWords
+    protected function parseComparisonOrParen(): AST\Comparison|AST\SearchWords|AST\Parenthesized
+    {
+        if ($this->lexer->glimpse()->type === TokenType::Lparen) {
+            $this->lexer->moveNext();
+            $logicals = [];
+            while ($this->lexer->glimpse()->type !== TokenType::Rparen) {
+                array_push($logicals, $this->parseLogical(self::PREC_OR));
+            }
+            $this->lexer->moveNext();
+
+            return new AST\Parenthesized($logicals);
+        } else {
+            return $this->parseComparison();
+        }
+    }
+
+    protected function parseLogical(int $precedence): AST\Logical|AST\Comparison|AST\SearchWords|AST\Parenthesized
     {
         if ($precedence === self::PREC_AND) {
-            $left = $this->parseComparison();
+            $left = $this->parseComparisonOrParen();
         } else {
             $left = $this->parseLogical($precedence + 1);
         }
@@ -85,7 +101,7 @@ class Parser
             $this->lexer->moveNext();
 
             if ($precedence === self::PREC_AND) {
-                $right = $this->parseComparison();
+                $right = $this->parseComparisonOrParen();
             } else {
                 $right = $this->parseLogical($precedence + 1);
             }

@@ -20,7 +20,14 @@ class Builder
     public function build(QueryBuilder $query, string $input): QueryBuilder
     {
         $ast = $this->parser->parse($input);
-        foreach ($ast as $node) {
+        $this->buildLogicals($query, $ast);
+
+        return $query;
+    }
+
+    public function buildLogicals(QueryBuilder $query, array $logicals): QueryBuilder
+    {
+        foreach ($logicals as $node) {
             if ($node instanceof AST\Comparison && $node->operator === AST\ComparisonOperator::Eq) {
                 if ($node->fieldName === 'limit' || $node->fieldName === 'limits') {
                     $query->limit((int) $node->fieldValue);
@@ -44,15 +51,17 @@ class Builder
                         $query->orWhere($column, 'like', '%'.$node->value.'%');
                     }
                 });
-                continue;
+            } elseif ($node instanceof AST\Parenthesized) {
+                $query->where(fn ($query) => $this->buildLogicals($query, $node->logicals));
+            } else {
+                $query->where(function (QueryBuilder $query) use ($node) {
+                    if ($node instanceof AST\Comparison) {
+                        $query->where($node->fieldName, $node->operator->value, $node->fieldValue);
+                    } elseif ($node instanceof AST\Logical) {
+                        $this->buildLogical($query, $node);
+                    }
+                });
             }
-            $query->where(function (QueryBuilder $query) use ($node) {
-                if ($node instanceof AST\Comparison) {
-                    $query->where($node->fieldName, $node->operator->value, $node->fieldValue);
-                } elseif ($node instanceof AST\Logical) {
-                    $this->buildLogical($query, $node);
-                }
-            });
         }
 
         return $query;
