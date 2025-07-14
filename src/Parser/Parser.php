@@ -36,10 +36,10 @@ class Parser
     protected function parseComparison(): AST\Comparison
     {
         $this->lexer->moveNext();
-        if ($this->lexer->lookahead->type !== TokenType::Ident) {
-            throw SyntaxError::expected($this->lexer->lookahead, 'field name');
-        }
-        $fieldName = $this->lexer->lookahead->value;
+        $fieldName = match ($this->lexer->lookahead->type) {
+            TokenType::Ident, TokenType::String, TokenType::Keyword => $this->lexer->lookahead->value,
+            default => throw SyntaxError::expected($this->lexer->lookahead, 'field name'),
+        };
 
         $this->lexer->moveNext();
         $operator = match ($this->lexer->lookahead->type) {
