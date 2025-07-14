@@ -26,6 +26,13 @@ class Builder
                     && ($node->fieldName === 'limit' || $node->fieldName === 'limits')) {
                     $query->limit((int) $node->fieldValue);
                     continue;
+                } elseif ($node->operator === AST\ComparisonOperator::Eq && $node->fieldName === 'sort') {
+                    if ($node->fieldValue[0] === '-') {
+                        $query->orderByDesc(substr($node->fieldValue, 1));
+                    } else {
+                        $query->orderBy($node->fieldValue);
+                    }
+                    continue;
                 }
             }
             $query->where(function (QueryBuilder $query) use ($node) {
