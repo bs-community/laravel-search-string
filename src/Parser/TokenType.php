@@ -6,7 +6,7 @@ namespace Blessing\LaravelSearchString\Parser;
 
 enum TokenType
 {
-    case None;
+    case Unknown;
     case Ident;
     case Keyword;
     case Number;

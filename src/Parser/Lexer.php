@@ -48,7 +48,7 @@ class Lexer extends AbstractLexer
                 ')' => TokenType::Rparen,
                 '&&' => TokenType::AmpAmp,
                 '||' => TokenType::BarBar,
-                default => TokenType::None,
+                default => TokenType::Unknown,
             };
         }
     }
