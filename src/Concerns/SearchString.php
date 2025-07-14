@@ -11,7 +11,7 @@ trait SearchString
 {
     public function scopeUsingSearchString(QueryBuilder $query, string $input)
     {
-        $builder = new Builder();
+        $builder = new Builder(isset($this->searchStringColumns) ? $this->searchStringColumns : []);
         $query->setQuery($builder->build($query->getQuery(), $input));
 
         return $query;

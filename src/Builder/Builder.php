@@ -12,7 +12,7 @@ class Builder
 {
     protected Parser $parser;
 
-    public function __construct()
+    public function __construct(protected array $searchStringColumns)
     {
         $this->parser = new Parser();
     }
@@ -36,6 +36,15 @@ class Builder
                     }
                     continue;
                 }
+            }
+            if ($node instanceof AST\SearchWords) {
+                $columns = $this->searchStringColumns;
+                $query->orWhere(function ($query) use ($columns, $node) {
+                    foreach ($columns as $column) {
+                        $query->orWhere($column, 'like', '%'.$node->value.'%');
+                    }
+                });
+                continue;
             }
             $query->where(function (QueryBuilder $query) use ($node) {
                 if ($node instanceof AST\Comparison) {

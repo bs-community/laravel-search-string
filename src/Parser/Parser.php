@@ -19,7 +19,7 @@ class Parser
     }
 
     /**
-     * @return list<AST\Comparison|AST\Logical>
+     * @return list<AST\Comparison|AST\Logical|AST\SearchWords>
      */
     public function parse(string $input): array
     {
@@ -33,7 +33,7 @@ class Parser
         return $logicals;
     }
 
-    protected function parseComparison(): AST\Comparison
+    protected function parseComparison(): AST\Comparison|AST\SearchWords
     {
         $this->lexer->moveNext();
         $fieldName = match ($this->lexer->lookahead->type) {
@@ -41,15 +41,19 @@ class Parser
             default => throw SyntaxError::expected($this->lexer->lookahead, 'field name'),
         };
 
-        $this->lexer->moveNext();
-        $operator = match ($this->lexer->lookahead->type) {
+        $operator = match ($this->lexer->glimpse()?->type) {
             TokenType::Eq, TokenType::Colon => AST\ComparisonOperator::Eq,
             TokenType::Gt => AST\ComparisonOperator::Gt,
             TokenType::Lt => AST\ComparisonOperator::Lt,
             TokenType::Ge => AST\ComparisonOperator::Ge,
             TokenType::Le => AST\ComparisonOperator::Le,
-            default => throw SyntaxError::expected($this->lexer->lookahead, 'operator'),
+            default => null,
         };
+        if ($operator === null) {
+            return new AST\SearchWords($fieldName);
+        } else {
+            $this->lexer->moveNext();
+        }
 
         $this->lexer->moveNext();
         $fieldValue = match ($this->lexer->lookahead->type) {
@@ -60,7 +64,7 @@ class Parser
         return new AST\Comparison($fieldName, $operator, $fieldValue);
     }
 
-    protected function parseLogical(int $precedence): AST\Logical|AST\Comparison
+    protected function parseLogical(int $precedence): AST\Logical|AST\Comparison|AST\SearchWords
     {
         if ($precedence === self::PREC_AND) {
             $left = $this->parseComparison();
